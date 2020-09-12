@@ -107,8 +107,7 @@ jobs:
           matrix.os == 'ubuntu-latest' && (startsWith(matrix.target, 'x86_64-unknown-linux-')
               || startsWith(matrix.target, 'i686-unknown-linux-'))
           || matrix.os == 'macos-latest' && startsWith(matrix.target, 'x86_64-apple-darwin')
-          || matrix.os == 'windows-latest' && startsWith(matrix.target, 'x86_64-pc
--windows')
+          || matrix.os == 'windows-latest' && startsWith(matrix.target, 'x86_64-pc-windows')
 
   coverage-tarpaulin:
     name: Tarpaulin
