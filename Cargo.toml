@@ -1,0 +1,12 @@
+[package]
+name = "ffi-ext"
+version = "0.1.0"
+edition = "2018"
+
+description = "Extension methods"
+readme = "README.md"
+authors = ["cptpcrd"]
+license = "MIT"
+repository = "https://github.com/cptpcrd/ffi-ext"
+
+[dependencies]
