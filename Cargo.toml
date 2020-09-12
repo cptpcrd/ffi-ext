@@ -9,4 +9,10 @@ authors = ["cptpcrd"]
 license = "MIT"
 repository = "https://github.com/cptpcrd/ffi-ext"
 
+[features]
+default = ["malloc-cstring"]
+
+malloc-cstring = ["libc"]
+
 [dependencies]
+libc = { version = "0.2", default-features = false, optional = true }

@@ -1,5 +1,10 @@
 use std::ffi::{OsStr, OsString};
 
+#[cfg(feature = "malloc-cstring")]
+mod malloc_cstring;
+#[cfg(feature = "malloc-cstring")]
+pub use malloc_cstring::*;
+
 #[cfg(unix)]
 mod unix;
 #[cfg(unix)]
