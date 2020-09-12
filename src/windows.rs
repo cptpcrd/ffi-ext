@@ -82,7 +82,7 @@ impl OsStrExt2 for OsStr {
 
             // Found a match; return
             if self_seq == substr_seq {
-                return Some(i);
+                return Some(i + 1 - self_seq.len());
             }
         }
 
@@ -112,7 +112,7 @@ impl OsStrExt2 for OsStr {
 
             // Found a match; store it until the end
             if self_seq == substr_seq {
-                res = Some(i);
+                res = Some(i + 1 - self_seq.len());
             }
         }
 
