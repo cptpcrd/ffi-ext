@@ -13,6 +13,8 @@ pub use windows::*;
 pub trait OsStrExt2 {
     fn starts_with(&self, prefix: &OsStr) -> bool;
     fn ends_with(&self, suffix: &OsStr) -> bool;
+
+    fn rfind_substr(&self, substr: &OsStr) -> Option<usize>;
     fn find_substr(&self, substr: &OsStr) -> Option<usize>;
 
     fn substr(&self, start: usize, end: usize) -> OsString;
@@ -52,10 +54,10 @@ mod tests {
 
     #[test]
     fn test_find_substr() {
-        assert_eq!(OsStr::new("abc").find_substr(OsStr::new("abc")), Some(0));
-        assert_eq!(OsStr::new("abc").find_substr(OsStr::new("ab")), Some(0));
+        assert_eq!(OsStr::new("abcabc").find_substr(OsStr::new("abc")), Some(0));
+        assert_eq!(OsStr::new("abcabc").find_substr(OsStr::new("ab")), Some(0));
         assert_eq!(OsStr::new("abc").find_substr(OsStr::new("bc")), Some(1));
-        assert_eq!(OsStr::new("abc").find_substr(OsStr::new("c")), Some(2));
+        assert_eq!(OsStr::new("abcabc").find_substr(OsStr::new("c")), Some(2));
 
         assert_eq!(OsStr::new("abc").find_substr(OsStr::new("abcd")), None);
         assert_eq!(OsStr::new("abc").find_substr(OsStr::new("d")), None);
@@ -63,6 +65,24 @@ mod tests {
         assert_eq!(OsStr::new("abc").find_substr(OsStr::new("")), Some(0));
         assert_eq!(OsStr::new("").find_substr(OsStr::new("")), Some(0));
         assert_eq!(OsStr::new("").find_substr(OsStr::new("abc")), None);
+    }
+
+    #[test]
+    fn test_rfind_substr() {
+        assert_eq!(
+            OsStr::new("abcabc").rfind_substr(OsStr::new("abc")),
+            Some(3)
+        );
+        assert_eq!(OsStr::new("abcabc").rfind_substr(OsStr::new("ab")), Some(3));
+        assert_eq!(OsStr::new("abc").rfind_substr(OsStr::new("bc")), Some(1));
+        assert_eq!(OsStr::new("abcabc").rfind_substr(OsStr::new("c")), Some(5));
+
+        assert_eq!(OsStr::new("abc").rfind_substr(OsStr::new("abcd")), None);
+        assert_eq!(OsStr::new("abc").rfind_substr(OsStr::new("d")), None);
+
+        assert_eq!(OsStr::new("abc").rfind_substr(OsStr::new("")), Some(3));
+        assert_eq!(OsStr::new("").rfind_substr(OsStr::new("")), Some(0));
+        assert_eq!(OsStr::new("").rfind_substr(OsStr::new("abc")), None);
     }
 
     #[test]

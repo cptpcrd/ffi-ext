@@ -80,12 +80,43 @@ impl OsStrExt2 for OsStr {
             }
             self_seq.push_back(self_ch);
 
+            // Found a match; return
             if self_seq == substr_seq {
                 return Some(i);
             }
         }
 
         None
+    }
+
+    fn rfind_substr(&self, substr: &OsStr) -> Option<usize> {
+        if substr.is_empty() {
+            return Some(self.encode_wide().count());
+        } else if self.is_empty() {
+            return None;
+        }
+
+        let mut res = None;
+
+        // Collect the unicode points in the search string
+        let substr_seq: Vec<u16> = substr.encode_wide().collect();
+
+        let mut self_seq = VecDeque::with_capacity(substr_seq.len());
+        for (i, self_ch) in self.encode_wide().enumerate() {
+            // Collect the unicode points in self, but only keep the last
+            // <however many the search string has>.
+            if self_seq.len() >= substr_seq.len() {
+                self_seq.pop_front();
+            }
+            self_seq.push_back(self_ch);
+
+            // Found a match; store it until the end
+            if self_seq == substr_seq {
+                res = Some(i);
+            }
+        }
+
+        res
     }
 
     fn substr(&self, start: usize, end: usize) -> OsString {
