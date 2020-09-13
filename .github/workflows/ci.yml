@@ -14,68 +14,12 @@ jobs:
 
       matrix:
         toolchain: [stable, beta, nightly]
-        target:
-          - x86_64-unknown-linux-gnu
-          - x86_64-unknown-linux-musl
-          - i686-unknown-linux-gnu
-          - i686-unknown-linux-musl
-          - x86_64-unknown-netbsd
+        target: [x86_64-unknown-linux-gnu]
         os: [ubuntu-latest]
         features: ['', memchr, twoway]
 
         include:
           - toolchain: stable
-            target: x86_64-apple-darwin
-            os: macos-latest
-            features: ''
-          - toolchain: beta
-            target: x86_64-apple-darwin
-            os: macos-latest
-            features: ''
-          - toolchain: nightly
-            target: x86_64-apple-darwin
-            os: macos-latest
-            features: ''
-
-          - toolchain: stable
-            target: x86_64-apple-darwin
-            os: macos-latest
-            features: memchr
-          - toolchain: beta
-            target: x86_64-apple-darwin
-            os: macos-latest
-            features: memchr
-          - toolchain: nightly
-            target: x86_64-apple-darwin
-            os: macos-latest
-            features: memchr
-
-          - toolchain: stable
-            target: x86_64-apple-darwin
-            os: macos-latest
-            features: twoway
-          - toolchain: beta
-            target: x86_64-apple-darwin
-            os: macos-latest
-            features: twoway
-          - toolchain: nightly
-            target: x86_64-apple-darwin
-            os: macos-latest
-            features: twoway
-
-          - toolchain: stable
-            target: x86_64-pc-windows-msvc
-            os: windows-latest
-            features: ''
-          - toolchain: beta
-            target: x86_64-pc-windows-msvc
-            os: windows-latest
-            features: ''
-          - toolchain: nightly
-            target: x86_64-pc-windows-msvc
-            os: windows-latest
-            features: ''
-          - toolchain: stable
             target: x86_64-pc-windows-gnu
             os: windows-latest
             features: ''
@@ -85,31 +29,6 @@ jobs:
             features: ''
           - toolchain: nightly
             target: x86_64-pc-windows-gnu
-            os: windows-latest
-            features: ''
-
-          - toolchain: stable
-            target: i686-pc-windows-msvc
-            os: windows-latest
-            features: ''
-          - toolchain: beta
-            target: i686-pc-windows-msvc
-            os: windows-latest
-            features: ''
-          - toolchain: nightly
-            target: i686-pc-windows-msvc
-            os: windows-latest
-            features: ''
-          - toolchain: stable
-            target: i686-pc-windows-gnu
-            os: windows-latest
-            features: ''
-          - toolchain: beta
-            target: i686-pc-windows-gnu
-            os: windows-latest
-            features: ''
-          - toolchain: nightly
-            target: i686-pc-windows-gnu
             os: windows-latest
             features: ''
 
@@ -126,9 +45,6 @@ jobs:
         with:
           toolchain: ${{ matrix.toolchain }}
           target: ${{ matrix.target }}
-      - name: Install 32-bit glibc build dependencies
-        run: sudo apt install gcc-multilib
-        if: matrix.os == 'ubuntu-latest' && matrix.target == 'i686-unknown-linux-gnu'
 
       - name: Build
         uses: actions-rs/cargo@v1
@@ -146,9 +62,7 @@ jobs:
         # Only try to run the tests if the OS/architecture we're building for
         # matches the host machine.
         if: >-
-          matrix.os == 'ubuntu-latest' && (startsWith(matrix.target, 'x86_64-unknown-linux-')
-              || startsWith(matrix.target, 'i686-unknown-linux-'))
-          || matrix.os == 'macos-latest' && startsWith(matrix.target, 'x86_64-apple-darwin')
+          matrix.os == 'ubuntu-latest' && startsWith(matrix.target, 'x86_64-unknown-linux-')
           || matrix.os == 'windows-latest' && startsWith(matrix.target, 'x86_64-pc-windows')
 
   coverage-tarpaulin:
@@ -159,9 +73,7 @@ jobs:
 
       matrix:
         toolchain: [stable]
-        target:
-          - x86_64-unknown-linux-gnu
-          - x86_64-unknown-linux-musl
+        target: [x86_64-unknown-linux-gnu]
         os: [ubuntu-latest]
         features: ['', memchr, twoway]
 
@@ -209,33 +121,9 @@ jobs:
 
       matrix:
         toolchain: [nightly]
-        target:
-          - x86_64-unknown-linux-gnu
-        os: [ubuntu-latest]
-        features: ['', memchr, twoway]
-
-        include:
-          - toolchain: nightly
-            target: x86_64-apple-darwin
-            os: macos-latest
-            features: ''
-          - toolchain: nightly
-            target: x86_64-apple-darwin
-            os: macos-latest
-            features: memchr
-          - toolchain: nightly
-            target: x86_64-apple-darwin
-            os: macos-latest
-            features: twoway
-
-          - toolchain: nightly
-            target: x86_64-pc-windows-msvc
-            os: windows-latest
-            features: ''
-          - toolchain: nightly
-            target: x86_64-pc-windows-gnu
-            os: windows-latest
-            features: ''
+        target: [x86_64-pc-windows-gnu]
+        os: [windows-latest]
+        features: ['']
 
     runs-on: ${{ matrix.os }}
 
