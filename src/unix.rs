@@ -12,6 +12,13 @@ impl OsStrExt2 for OsStr {
         self.as_bytes().ends_with(suffix.as_bytes())
     }
 
+    #[cfg(feature = "twoway")]
+    #[inline]
+    fn find_substr(&self, substr: &OsStr) -> Option<usize> {
+        twoway::find_bytes(self.as_bytes(), substr.as_bytes())
+    }
+
+    #[cfg(not(feature = "twoway"))]
     fn find_substr(&self, substr: &OsStr) -> Option<usize> {
         if substr.is_empty() {
             return Some(0);
@@ -22,10 +29,16 @@ impl OsStrExt2 for OsStr {
         let bytes = self.as_bytes();
         let substr_bytes = substr.as_bytes();
 
-        let sub_len = substr_bytes.len();
+        #[cfg(feature = "memchr")]
+        let indices = match substr_bytes.len() {
+            1 => return memchr::memchr(substr_bytes[0], bytes),
+            len => memchr::memchr_iter(substr_bytes[0], &bytes[..bytes.len() + 1 - len]),
+        };
+        #[cfg(not(feature = "memchr"))]
+        let indices = 0..=(bytes.len().checked_sub(substr_bytes.len())?);
 
-        for i in 0..=(bytes.len().checked_sub(sub_len)?) {
-            if &bytes[i..i + sub_len] == substr_bytes {
+        for i in indices {
+            if &bytes[i..i + substr_bytes.len()] == substr_bytes {
                 return Some(i);
             }
         }
@@ -33,6 +46,13 @@ impl OsStrExt2 for OsStr {
         None
     }
 
+    #[cfg(feature = "twoway")]
+    #[inline]
+    fn rfind_substr(&self, substr: &OsStr) -> Option<usize> {
+        twoway::rfind_bytes(self.as_bytes(), substr.as_bytes())
+    }
+
+    #[cfg(not(feature = "twoway"))]
     fn rfind_substr(&self, substr: &OsStr) -> Option<usize> {
         if substr.is_empty() {
             return Some(self.as_bytes().len());
@@ -43,10 +63,16 @@ impl OsStrExt2 for OsStr {
         let bytes = self.as_bytes();
         let substr_bytes = substr.as_bytes();
 
-        let sub_len = substr_bytes.len();
+        #[cfg(feature = "memchr")]
+        let indices = match substr_bytes.len() {
+            1 => return memchr::memrchr(substr_bytes[0], bytes),
+            len => memchr::memrchr_iter(substr_bytes[0], &bytes[..bytes.len() + 1 - len]),
+        };
+        #[cfg(not(feature = "memchr"))]
+        let indices = (0..=(bytes.len().checked_sub(substr_bytes.len())?)).rev();
 
-        for i in (0..=(bytes.len().checked_sub(sub_len)?)).rev() {
-            if &bytes[i..i + sub_len] == substr_bytes {
+        for i in indices {
+            if &bytes[i..i + substr_bytes.len()] == substr_bytes {
                 return Some(i);
             }
         }

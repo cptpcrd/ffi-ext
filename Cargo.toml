@@ -9,4 +9,11 @@ authors = ["cptpcrd"]
 license = "MIT"
 repository = "https://github.com/cptpcrd/ffi-ext"
 
+[features]
+default = ["memchr"]
+
 [dependencies]
+
+[target.'cfg(unix)'.dependencies]
+memchr = { version = "2.3", optional = true }
+twoway = { version = "0.2", optional = true }
