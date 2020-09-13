@@ -60,6 +60,8 @@ mod tests {
         assert_eq!(OsStr::new("abcabc").find_substr(OsStr::new("c")), Some(2));
 
         assert_eq!(OsStr::new("abc").find_substr(OsStr::new("abcd")), None);
+        assert_eq!(OsStr::new("abc").find_substr(OsStr::new("abcde")), None);
+        assert_eq!(OsStr::new("abc").find_substr(OsStr::new("abcdefghi")), None);
         assert_eq!(OsStr::new("abc").find_substr(OsStr::new("d")), None);
 
         assert_eq!(OsStr::new("abc").find_substr(OsStr::new("")), Some(0));
@@ -95,6 +97,11 @@ mod tests {
         assert_eq!(OsStr::new("abcabc").rfind_substr(OsStr::new("c")), Some(5));
 
         assert_eq!(OsStr::new("abc").rfind_substr(OsStr::new("abcd")), None);
+        assert_eq!(OsStr::new("abc").rfind_substr(OsStr::new("abcde")), None);
+        assert_eq!(
+            OsStr::new("abc").rfind_substr(OsStr::new("abcdefghi")),
+            None
+        );
         assert_eq!(OsStr::new("abc").rfind_substr(OsStr::new("d")), None);
 
         assert_eq!(OsStr::new("abc").rfind_substr(OsStr::new("")), Some(3));

@@ -32,7 +32,9 @@ impl OsStrExt2 for OsStr {
         #[cfg(feature = "memchr")]
         let indices = match substr_bytes.len() {
             1 => return memchr::memchr(substr_bytes[0], bytes),
-            len => memchr::memchr_iter(substr_bytes[0], &bytes[..bytes.len() + 1 - len]),
+            len => {
+                memchr::memchr_iter(substr_bytes[0], &bytes[..bytes.len().checked_sub(len)? + 1])
+            }
         };
         #[cfg(not(feature = "memchr"))]
         let indices = 0..=(bytes.len().checked_sub(substr_bytes.len())?);
@@ -66,7 +68,9 @@ impl OsStrExt2 for OsStr {
         #[cfg(feature = "memchr")]
         let indices = match substr_bytes.len() {
             1 => return memchr::memrchr(substr_bytes[0], bytes),
-            len => memchr::memrchr_iter(substr_bytes[0], &bytes[..bytes.len() + 1 - len]),
+            len => {
+                memchr::memrchr_iter(substr_bytes[0], &bytes[..bytes.len().checked_sub(len)? + 1])
+            }
         };
         #[cfg(not(feature = "memchr"))]
         let indices = (0..=(bytes.len().checked_sub(substr_bytes.len())?)).rev();
