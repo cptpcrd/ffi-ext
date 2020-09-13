@@ -31,19 +31,40 @@ task:
     - pkg install -y curl kcov bash
     - curl -sSf https://sh.rustup.rs -o rustup.sh
     - sh rustup.sh -y --profile default --default-toolchain $TOOLCHAIN
-  build_script:
+
+  test_no_features_script:
     - . $HOME/.cargo/env
-    - cargo build
-  test_script:
-    - . $HOME/.cargo/env
-    - cargo test
+    - cargo test --no-default-features
     - |
-      mkdir -p coverage-build
+      mkdir -p coverage-no-features
       for f in target/debug/deps/*; do
         if [ -x "$f" ]; then
-          kcov --exclude-pattern=/.cargo,/.rustup,/usr/lib --verify coverage-build/ "$f"
+          kcov --exclude-pattern=/.cargo,/.rustup,/usr/lib --verify coverage-no-features/ "$f"
         fi
       done
+
+  test_memchr_script:
+    - . $HOME/.cargo/env
+    - cargo test --no-default-features --features memchr
+    - |
+      mkdir -p coverage-memchr
+      for f in target/debug/deps/*; do
+        if [ -x "$f" ]; then
+          kcov --exclude-pattern=/.cargo,/.rustup,/usr/lib --verify coverage-memchr/ "$f"
+        fi
+      done
+
+  test_twoway_script:
+    - . $HOME/.cargo/env
+    - cargo test --no-default-features --features twoway
+    - |
+      mkdir -p coverage-twoway
+      for f in target/debug/deps/*; do
+        if [ -x "$f" ]; then
+          kcov --exclude-pattern=/.cargo,/.rustup,/usr/lib --verify coverage-twoway/ "$f"
+        fi
+      done
+
   coverage_collect_upload_script:
-    - kcov --merge coverage-merged/ coverage-build/
+    - kcov --merge coverage-merged/ coverage-no-features/ coverage-memchr/ coverage-twoway/
     - OS="$FREEBSD_IMAGE" bash <(curl -s https://codecov.io/bash) -e OS,TOOLCHAIN -n "$FREEBSD_IMAGE-$TOOLCHAIN" -Z -f coverage-merged/kcov-merged/cobertura.xml

@@ -21,55 +21,97 @@ jobs:
           - i686-unknown-linux-musl
           - x86_64-unknown-netbsd
         os: [ubuntu-latest]
+        features: ['', memchr, twoway]
 
         include:
           - toolchain: stable
             target: x86_64-apple-darwin
             os: macos-latest
+            features: ''
           - toolchain: beta
             target: x86_64-apple-darwin
             os: macos-latest
+            features: ''
           - toolchain: nightly
             target: x86_64-apple-darwin
             os: macos-latest
+            features: ''
+
+          - toolchain: stable
+            target: x86_64-apple-darwin
+            os: macos-latest
+            features: memchr
+          - toolchain: beta
+            target: x86_64-apple-darwin
+            os: macos-latest
+            features: memchr
+          - toolchain: nightly
+            target: x86_64-apple-darwin
+            os: macos-latest
+            features: memchr
+
+          - toolchain: stable
+            target: x86_64-apple-darwin
+            os: macos-latest
+            features: twoway
+          - toolchain: beta
+            target: x86_64-apple-darwin
+            os: macos-latest
+            features: twoway
+          - toolchain: nightly
+            target: x86_64-apple-darwin
+            os: macos-latest
+            features: twoway
 
           - toolchain: stable
             target: x86_64-pc-windows-msvc
             os: windows-latest
+            features: ''
           - toolchain: beta
             target: x86_64-pc-windows-msvc
             os: windows-latest
+            features: ''
           - toolchain: nightly
             target: x86_64-pc-windows-msvc
             os: windows-latest
+            features: ''
           - toolchain: stable
             target: x86_64-pc-windows-gnu
             os: windows-latest
+            features: ''
           - toolchain: beta
             target: x86_64-pc-windows-gnu
             os: windows-latest
+            features: ''
           - toolchain: nightly
             target: x86_64-pc-windows-gnu
             os: windows-latest
+            features: ''
 
           - toolchain: stable
             target: i686-pc-windows-msvc
             os: windows-latest
+            features: ''
           - toolchain: beta
             target: i686-pc-windows-msvc
             os: windows-latest
+            features: ''
           - toolchain: nightly
             target: i686-pc-windows-msvc
             os: windows-latest
+            features: ''
           - toolchain: stable
             target: i686-pc-windows-gnu
             os: windows-latest
+            features: ''
           - toolchain: beta
             target: i686-pc-windows-gnu
             os: windows-latest
+            features: ''
           - toolchain: nightly
             target: i686-pc-windows-gnu
             os: windows-latest
+            features: ''
 
     # Allow nightly builds to fail
     continue-on-error: ${{ matrix.toolchain == 'nightly' }}
@@ -93,14 +135,14 @@ jobs:
         with:
           toolchain: ${{ matrix.toolchain }}
           command: build
-          args: --verbose --target ${{ matrix.target }}
+          args: --verbose --target ${{ matrix.target }} --no-default-features --features '${{ matrix.features }}'
 
       - name: Run tests
         uses: actions-rs/cargo@v1
         with:
           toolchain: ${{ matrix.toolchain }}
           command: test
-          args: --verbose --target ${{ matrix.target }}
+          args: --verbose --target ${{ matrix.target }} --no-default-features --features '${{ matrix.features }}'
         # Only try to run the tests if the OS/architecture we're building for
         # matches the host machine.
         if: >-
@@ -121,6 +163,7 @@ jobs:
           - x86_64-unknown-linux-gnu
           - x86_64-unknown-linux-musl
         os: [ubuntu-latest]
+        features: ['', memchr, twoway]
 
     runs-on: ${{ matrix.os }}
 
@@ -144,7 +187,7 @@ jobs:
         with:
           toolchain: ${{ matrix.toolchain }}
           command: tarpaulin
-          args: --verbose --out Xml --target ${{ matrix.target }}
+          args: --verbose --out Xml --target ${{ matrix.target }} --no-default-features --features '${{ matrix.features }}'
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1.0.13
@@ -169,18 +212,30 @@ jobs:
         target:
           - x86_64-unknown-linux-gnu
         os: [ubuntu-latest]
+        features: ['', memchr, twoway]
 
         include:
           - toolchain: nightly
             target: x86_64-apple-darwin
             os: macos-latest
+            features: ''
+          - toolchain: nightly
+            target: x86_64-apple-darwin
+            os: macos-latest
+            features: memchr
+          - toolchain: nightly
+            target: x86_64-apple-darwin
+            os: macos-latest
+            features: twoway
 
           - toolchain: nightly
             target: x86_64-pc-windows-msvc
             os: windows-latest
+            features: ''
           - toolchain: nightly
             target: x86_64-pc-windows-gnu
             os: windows-latest
+            features: ''
 
     runs-on: ${{ matrix.os }}
 
@@ -197,7 +252,7 @@ jobs:
         with:
           toolchain: ${{ matrix.toolchain }}
           command: test
-          args: --verbose --target ${{ matrix.target }}
+          args: --verbose --target ${{ matrix.target }} --no-default-features --features '${{ matrix.features }}'
         env:
           CARGO_INCREMENTAL: '0'
           RUSTFLAGS: -Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort
