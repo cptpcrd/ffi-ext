@@ -33,11 +33,13 @@ impl OsStrExt2 for OsStr {
         };
 
         #[cfg(not(feature = "memchr"))]
-        let indices = {
-            if needle.is_empty() {
-                return Some(0);
+        let indices = match needle.len() {
+            0 => return Some(0),
+            1 => {
+                let search_ch = needle[0];
+                return haystack.iter().position(|&ch| ch == search_ch);
             }
-            0..=(haystack.len().checked_sub(needle.len())?)
+            len => (0..=(haystack.len().checked_sub(len)?)),
         };
 
         for i in indices {
@@ -70,11 +72,13 @@ impl OsStrExt2 for OsStr {
         };
 
         #[cfg(not(feature = "memchr"))]
-        let indices = {
-            if needle.is_empty() {
-                return Some(haystack.len());
+        let indices = match needle.len() {
+            0 => return Some(haystack.len()),
+            1 => {
+                let search_ch = needle[0];
+                return haystack.iter().rposition(|&ch| ch == search_ch);
             }
-            (0..=(haystack.len().checked_sub(needle.len())?)).rev()
+            len => (0..=(haystack.len().checked_sub(len)?)).rev(),
         };
 
         for i in indices {
