@@ -20,24 +20,25 @@ impl OsStrExt2 for OsStr {
 
     #[cfg(not(feature = "twoway"))]
     fn find(&self, needle: &OsStr) -> Option<usize> {
-        if needle.is_empty() {
-            return Some(0);
-        } else if self.is_empty() {
-            return None;
-        }
-
         let haystack = self.as_bytes();
         let needle = needle.as_bytes();
 
         #[cfg(feature = "memchr")]
         let indices = match needle.len() {
+            0 => return Some(0),
             1 => return memchr::memchr(needle[0], haystack),
             len => {
                 memchr::memchr_iter(needle[0], &haystack[..haystack.len().checked_sub(len)? + 1])
             }
         };
+
         #[cfg(not(feature = "memchr"))]
-        let indices = 0..=(haystack.len().checked_sub(needle.len())?);
+        let indices = {
+            if needle.is_empty() {
+                return Some(0);
+            }
+            0..=(haystack.len().checked_sub(needle.len())?)
+        };
 
         for i in indices {
             if &haystack[i..i + needle.len()] == needle {
@@ -56,24 +57,25 @@ impl OsStrExt2 for OsStr {
 
     #[cfg(not(feature = "twoway"))]
     fn rfind(&self, needle: &OsStr) -> Option<usize> {
-        if needle.is_empty() {
-            return Some(self.as_bytes().len());
-        } else if self.is_empty() {
-            return None;
-        }
-
         let haystack = self.as_bytes();
         let needle = needle.as_bytes();
 
         #[cfg(feature = "memchr")]
         let indices = match needle.len() {
+            0 => return Some(haystack.len()),
             1 => return memchr::memrchr(needle[0], haystack),
             len => {
                 memchr::memrchr_iter(needle[0], &haystack[..haystack.len().checked_sub(len)? + 1])
             }
         };
+
         #[cfg(not(feature = "memchr"))]
-        let indices = (0..=(haystack.len().checked_sub(needle.len())?)).rev();
+        let indices = {
+            if needle.is_empty() {
+                return Some(haystack.len());
+            }
+            (0..=(haystack.len().checked_sub(needle.len())?)).rev()
+        };
 
         for i in indices {
             if &haystack[i..i + needle.len()] == needle {
