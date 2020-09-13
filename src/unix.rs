@@ -14,12 +14,12 @@ impl OsStrExt2 for OsStr {
 
     #[cfg(feature = "twoway")]
     #[inline]
-    fn find_substr(&self, substr: &OsStr) -> Option<usize> {
+    fn find(&self, substr: &OsStr) -> Option<usize> {
         twoway::find_bytes(self.as_bytes(), substr.as_bytes())
     }
 
     #[cfg(not(feature = "twoway"))]
-    fn find_substr(&self, substr: &OsStr) -> Option<usize> {
+    fn find(&self, substr: &OsStr) -> Option<usize> {
         if substr.is_empty() {
             return Some(0);
         } else if self.is_empty() {
@@ -50,12 +50,12 @@ impl OsStrExt2 for OsStr {
 
     #[cfg(feature = "twoway")]
     #[inline]
-    fn rfind_substr(&self, substr: &OsStr) -> Option<usize> {
+    fn rfind(&self, substr: &OsStr) -> Option<usize> {
         twoway::rfind_bytes(self.as_bytes(), substr.as_bytes())
     }
 
     #[cfg(not(feature = "twoway"))]
-    fn rfind_substr(&self, substr: &OsStr) -> Option<usize> {
+    fn rfind(&self, substr: &OsStr) -> Option<usize> {
         if substr.is_empty() {
             return Some(self.as_bytes().len());
         } else if self.is_empty() {

@@ -61,7 +61,7 @@ impl OsStrExt2 for OsStr {
         self_seq == suffix_seq
     }
 
-    fn find_substr(&self, substr: &OsStr) -> Option<usize> {
+    fn find(&self, substr: &OsStr) -> Option<usize> {
         if substr.is_empty() {
             return Some(0);
         } else if self.is_empty() {
@@ -89,7 +89,7 @@ impl OsStrExt2 for OsStr {
         None
     }
 
-    fn rfind_substr(&self, substr: &OsStr) -> Option<usize> {
+    fn rfind(&self, substr: &OsStr) -> Option<usize> {
         if substr.is_empty() {
             return Some(self.encode_wide().count());
         } else if self.is_empty() {

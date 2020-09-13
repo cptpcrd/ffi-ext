@@ -14,8 +14,8 @@ pub trait OsStrExt2 {
     fn starts_with(&self, prefix: &OsStr) -> bool;
     fn ends_with(&self, suffix: &OsStr) -> bool;
 
-    fn rfind_substr(&self, substr: &OsStr) -> Option<usize>;
-    fn find_substr(&self, substr: &OsStr) -> Option<usize>;
+    fn rfind(&self, needle: &OsStr) -> Option<usize>;
+    fn find(&self, needle: &OsStr) -> Option<usize>;
 
     fn substr(&self, start: usize, end: usize) -> OsString;
 }
@@ -53,75 +53,69 @@ mod tests {
     }
 
     #[test]
-    fn test_find_substr() {
-        assert_eq!(OsStr::new("abcabc").find_substr(OsStr::new("abc")), Some(0));
-        assert_eq!(OsStr::new("abcabc").find_substr(OsStr::new("ab")), Some(0));
-        assert_eq!(OsStr::new("abc").find_substr(OsStr::new("bc")), Some(1));
-        assert_eq!(OsStr::new("abcabc").find_substr(OsStr::new("c")), Some(2));
+    fn test_find() {
+        assert_eq!(OsStr::new("abcabc").find(OsStr::new("abc")), Some(0));
+        assert_eq!(OsStr::new("abcabc").find(OsStr::new("ab")), Some(0));
+        assert_eq!(OsStr::new("abc").find(OsStr::new("bc")), Some(1));
+        assert_eq!(OsStr::new("abcabc").find(OsStr::new("c")), Some(2));
 
-        assert_eq!(OsStr::new("abc").find_substr(OsStr::new("abcd")), None);
-        assert_eq!(OsStr::new("abc").find_substr(OsStr::new("abcde")), None);
-        assert_eq!(OsStr::new("abc").find_substr(OsStr::new("abcdefghi")), None);
-        assert_eq!(OsStr::new("abc").find_substr(OsStr::new("d")), None);
+        assert_eq!(OsStr::new("abc").find(OsStr::new("abcd")), None);
+        assert_eq!(OsStr::new("abc").find(OsStr::new("abcde")), None);
+        assert_eq!(OsStr::new("abc").find(OsStr::new("abcdefghi")), None);
+        assert_eq!(OsStr::new("abc").find(OsStr::new("d")), None);
 
-        assert_eq!(OsStr::new("abc").find_substr(OsStr::new("")), Some(0));
-        assert_eq!(OsStr::new("").find_substr(OsStr::new("")), Some(0));
-        assert_eq!(OsStr::new("").find_substr(OsStr::new("abc")), None);
+        assert_eq!(OsStr::new("abc").find(OsStr::new("")), Some(0));
+        assert_eq!(OsStr::new("").find(OsStr::new("")), Some(0));
+        assert_eq!(OsStr::new("").find(OsStr::new("abc")), None);
 
         assert_eq!(
-            OsStr::new("abcdefghijklabce").find_substr(OsStr::new("abcd")),
+            OsStr::new("abcdefghijklabce").find(OsStr::new("abcd")),
             Some(0)
         );
         assert_eq!(
-            OsStr::new("abcdefghijklabce").find_substr(OsStr::new("abc")),
+            OsStr::new("abcdefghijklabce").find(OsStr::new("abc")),
             Some(0)
         );
         assert_eq!(
-            OsStr::new("abcdefghijklabce").find_substr(OsStr::new("abce")),
+            OsStr::new("abcdefghijklabce").find(OsStr::new("abce")),
             Some(12)
         );
         assert_eq!(
-            OsStr::new("abcdefghijklabce").find_substr(OsStr::new("abcf")),
+            OsStr::new("abcdefghijklabce").find(OsStr::new("abcf")),
             None
         );
     }
 
     #[test]
-    fn test_rfind_substr() {
-        assert_eq!(
-            OsStr::new("abcabc").rfind_substr(OsStr::new("abc")),
-            Some(3)
-        );
-        assert_eq!(OsStr::new("abcabc").rfind_substr(OsStr::new("ab")), Some(3));
-        assert_eq!(OsStr::new("abc").rfind_substr(OsStr::new("bc")), Some(1));
-        assert_eq!(OsStr::new("abcabc").rfind_substr(OsStr::new("c")), Some(5));
+    fn test_rfind() {
+        assert_eq!(OsStr::new("abcabc").rfind(OsStr::new("abc")), Some(3));
+        assert_eq!(OsStr::new("abcabc").rfind(OsStr::new("ab")), Some(3));
+        assert_eq!(OsStr::new("abc").rfind(OsStr::new("bc")), Some(1));
+        assert_eq!(OsStr::new("abcabc").rfind(OsStr::new("c")), Some(5));
 
-        assert_eq!(OsStr::new("abc").rfind_substr(OsStr::new("abcd")), None);
-        assert_eq!(OsStr::new("abc").rfind_substr(OsStr::new("abcde")), None);
-        assert_eq!(
-            OsStr::new("abc").rfind_substr(OsStr::new("abcdefghi")),
-            None
-        );
-        assert_eq!(OsStr::new("abc").rfind_substr(OsStr::new("d")), None);
+        assert_eq!(OsStr::new("abc").rfind(OsStr::new("abcd")), None);
+        assert_eq!(OsStr::new("abc").rfind(OsStr::new("abcde")), None);
+        assert_eq!(OsStr::new("abc").rfind(OsStr::new("abcdefghi")), None);
+        assert_eq!(OsStr::new("abc").rfind(OsStr::new("d")), None);
 
-        assert_eq!(OsStr::new("abc").rfind_substr(OsStr::new("")), Some(3));
-        assert_eq!(OsStr::new("").rfind_substr(OsStr::new("")), Some(0));
-        assert_eq!(OsStr::new("").rfind_substr(OsStr::new("abc")), None);
+        assert_eq!(OsStr::new("abc").rfind(OsStr::new("")), Some(3));
+        assert_eq!(OsStr::new("").rfind(OsStr::new("")), Some(0));
+        assert_eq!(OsStr::new("").rfind(OsStr::new("abc")), None);
 
         assert_eq!(
-            OsStr::new("abcdefghijklabce").rfind_substr(OsStr::new("abcd")),
+            OsStr::new("abcdefghijklabce").rfind(OsStr::new("abcd")),
             Some(0)
         );
         assert_eq!(
-            OsStr::new("abcdefghijklabce").rfind_substr(OsStr::new("abc")),
+            OsStr::new("abcdefghijklabce").rfind(OsStr::new("abc")),
             Some(12)
         );
         assert_eq!(
-            OsStr::new("abcdefghijklabce").rfind_substr(OsStr::new("abce")),
+            OsStr::new("abcdefghijklabce").rfind(OsStr::new("abce")),
             Some(12)
         );
         assert_eq!(
-            OsStr::new("abcdefghijklabce").find_substr(OsStr::new("abcf")),
+            OsStr::new("abcdefghijklabce").find(OsStr::new("abcf")),
             None
         );
     }
