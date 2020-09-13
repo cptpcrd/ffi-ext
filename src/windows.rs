@@ -80,8 +80,8 @@ impl OsStrExt2 for OsStr {
             }
             haystack_q.push_back(self_ch);
 
-            // Found a match; store it until the end
             if haystack_q == needle {
+                // Found a match; return it
                 return Some(i + 1 - haystack_q.len());
             }
         }
@@ -110,8 +110,8 @@ impl OsStrExt2 for OsStr {
             }
             haystack_q.push_back(self_ch);
 
-            // Found a match; store it until the end
             if haystack_q == needle {
+                // Found a match; store it until the end
                 res = Some(i + 1 - haystack_q.len());
             }
         }
