@@ -14,33 +14,33 @@ impl OsStrExt2 for OsStr {
 
     #[cfg(feature = "twoway")]
     #[inline]
-    fn find(&self, substr: &OsStr) -> Option<usize> {
-        twoway::find_bytes(self.as_bytes(), substr.as_bytes())
+    fn find(&self, needle: &OsStr) -> Option<usize> {
+        twoway::find_bytes(self.as_bytes(), needle.as_bytes())
     }
 
     #[cfg(not(feature = "twoway"))]
-    fn find(&self, substr: &OsStr) -> Option<usize> {
-        if substr.is_empty() {
+    fn find(&self, needle: &OsStr) -> Option<usize> {
+        if needle.is_empty() {
             return Some(0);
         } else if self.is_empty() {
             return None;
         }
 
-        let bytes = self.as_bytes();
-        let substr_bytes = substr.as_bytes();
+        let haystack = self.as_bytes();
+        let needle = needle.as_bytes();
 
         #[cfg(feature = "memchr")]
-        let indices = match substr_bytes.len() {
-            1 => return memchr::memchr(substr_bytes[0], bytes),
+        let indices = match needle.len() {
+            1 => return memchr::memchr(needle[0], haystack),
             len => {
-                memchr::memchr_iter(substr_bytes[0], &bytes[..bytes.len().checked_sub(len)? + 1])
+                memchr::memchr_iter(needle[0], &haystack[..haystack.len().checked_sub(len)? + 1])
             }
         };
         #[cfg(not(feature = "memchr"))]
-        let indices = 0..=(bytes.len().checked_sub(substr_bytes.len())?);
+        let indices = 0..=(haystack.len().checked_sub(needle.len())?);
 
         for i in indices {
-            if &bytes[i..i + substr_bytes.len()] == substr_bytes {
+            if &haystack[i..i + needle.len()] == needle {
                 return Some(i);
             }
         }
@@ -50,33 +50,33 @@ impl OsStrExt2 for OsStr {
 
     #[cfg(feature = "twoway")]
     #[inline]
-    fn rfind(&self, substr: &OsStr) -> Option<usize> {
-        twoway::rfind_bytes(self.as_bytes(), substr.as_bytes())
+    fn rfind(&self, needle: &OsStr) -> Option<usize> {
+        twoway::rfind_bytes(self.as_bytes(), needle.as_bytes())
     }
 
     #[cfg(not(feature = "twoway"))]
-    fn rfind(&self, substr: &OsStr) -> Option<usize> {
-        if substr.is_empty() {
+    fn rfind(&self, needle: &OsStr) -> Option<usize> {
+        if needle.is_empty() {
             return Some(self.as_bytes().len());
         } else if self.is_empty() {
             return None;
         }
 
-        let bytes = self.as_bytes();
-        let substr_bytes = substr.as_bytes();
+        let haystack = self.as_bytes();
+        let needle = needle.as_bytes();
 
         #[cfg(feature = "memchr")]
-        let indices = match substr_bytes.len() {
-            1 => return memchr::memrchr(substr_bytes[0], bytes),
+        let indices = match needle.len() {
+            1 => return memchr::memrchr(needle[0], haystack),
             len => {
-                memchr::memrchr_iter(substr_bytes[0], &bytes[..bytes.len().checked_sub(len)? + 1])
+                memchr::memrchr_iter(needle[0], &haystack[..haystack.len().checked_sub(len)? + 1])
             }
         };
         #[cfg(not(feature = "memchr"))]
-        let indices = (0..=(bytes.len().checked_sub(substr_bytes.len())?)).rev();
+        let indices = (0..=(haystack.len().checked_sub(needle.len())?)).rev();
 
         for i in indices {
-            if &bytes[i..i + substr_bytes.len()] == substr_bytes {
+            if &haystack[i..i + needle.len()] == needle {
                 return Some(i);
             }
         }

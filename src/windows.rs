@@ -61,36 +61,36 @@ impl OsStrExt2 for OsStr {
         self_seq == suffix_seq
     }
 
-    fn find(&self, substr: &OsStr) -> Option<usize> {
-        if substr.is_empty() {
+    fn find(&self, needle: &OsStr) -> Option<usize> {
+        if needle.is_empty() {
             return Some(0);
         } else if self.is_empty() {
             return None;
         }
 
         // Collect the unicode points in the search string
-        let substr_seq: Vec<u16> = substr.encode_wide().collect();
+        let needle: Vec<u16> = needle.encode_wide().collect();
 
-        let mut self_seq = VecDeque::with_capacity(substr_seq.len());
+        let mut haystack_q = VecDeque::with_capacity(needle.len());
         for (i, self_ch) in self.encode_wide().enumerate() {
             // Collect the unicode points in self, but only keep the last
             // <however many the search string has>.
-            if self_seq.len() >= substr_seq.len() {
-                self_seq.pop_front();
+            if haystack_q.len() >= needle.len() {
+                haystack_q.pop_front();
             }
-            self_seq.push_back(self_ch);
+            haystack_q.push_back(self_ch);
 
-            // Found a match; return
-            if self_seq == substr_seq {
-                return Some(i + 1 - self_seq.len());
+            // Found a match; store it until the end
+            if haystack_q == needle {
+                return Some(i + 1 - haystack_q.len());
             }
         }
 
         None
     }
 
-    fn rfind(&self, substr: &OsStr) -> Option<usize> {
-        if substr.is_empty() {
+    fn rfind(&self, needle: &OsStr) -> Option<usize> {
+        if needle.is_empty() {
             return Some(self.encode_wide().count());
         } else if self.is_empty() {
             return None;
@@ -99,20 +99,20 @@ impl OsStrExt2 for OsStr {
         let mut res = None;
 
         // Collect the unicode points in the search string
-        let substr_seq: Vec<u16> = substr.encode_wide().collect();
+        let needle: Vec<u16> = needle.encode_wide().collect();
 
-        let mut self_seq = VecDeque::with_capacity(substr_seq.len());
+        let mut haystack_q = VecDeque::with_capacity(needle.len());
         for (i, self_ch) in self.encode_wide().enumerate() {
             // Collect the unicode points in self, but only keep the last
             // <however many the search string has>.
-            if self_seq.len() >= substr_seq.len() {
-                self_seq.pop_front();
+            if haystack_q.len() >= needle.len() {
+                haystack_q.pop_front();
             }
-            self_seq.push_back(self_ch);
+            haystack_q.push_back(self_ch);
 
             // Found a match; store it until the end
-            if self_seq == substr_seq {
-                res = Some(i + 1 - self_seq.len());
+            if haystack_q == needle {
+                res = Some(i + 1 - haystack_q.len());
             }
         }
 
