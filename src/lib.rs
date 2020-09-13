@@ -66,6 +66,8 @@ mod tests {
 
         assert_eq!(OsStr::new("abc").find(OsStr::new("")), Some(0));
         assert_eq!(OsStr::new("").find(OsStr::new("")), Some(0));
+        assert_eq!(OsStr::new("").find(OsStr::new("a")), None);
+        assert_eq!(OsStr::new("").find(OsStr::new("ab")), None);
         assert_eq!(OsStr::new("").find(OsStr::new("abc")), None);
 
         assert_eq!(
@@ -100,6 +102,8 @@ mod tests {
 
         assert_eq!(OsStr::new("abc").rfind(OsStr::new("")), Some(3));
         assert_eq!(OsStr::new("").rfind(OsStr::new("")), Some(0));
+        assert_eq!(OsStr::new("").rfind(OsStr::new("a")), None);
+        assert_eq!(OsStr::new("").rfind(OsStr::new("ab")), None);
         assert_eq!(OsStr::new("").rfind(OsStr::new("abc")), None);
 
         assert_eq!(
