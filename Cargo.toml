@@ -3,7 +3,7 @@ name = "ffi-ext"
 version = "0.1.0"
 edition = "2018"
 
-description = "Extension methods"
+description = "Extension methods for types in std::ffi"
 readme = "README.md"
 authors = ["cptpcrd"]
 license = "MIT"
