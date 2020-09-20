@@ -175,9 +175,36 @@ impl OsStrExt2 for OsStr {
     }
 
     #[cfg(not(feature = "twoway"))]
-    #[inline]
     fn find(&self, needle: &OsStr) -> Option<usize> {
-        self.find_all(needle).next()
+        let haystack = self.as_bytes();
+        let needle = needle.as_bytes();
+
+        #[cfg(feature = "memchr")]
+        let indices = match needle.len() {
+            0 => return Some(0),
+            1 => return memchr::memchr(needle[0], haystack),
+            len => {
+                memchr::memchr_iter(needle[0], &haystack[..haystack.len().checked_sub(len)? + 1])
+            }
+        };
+
+        #[cfg(not(feature = "memchr"))]
+        let indices = match needle.len() {
+            0 => return Some(0),
+            1 => {
+                let search_ch = needle[0];
+                return haystack.iter().position(|&ch| ch == search_ch);
+            }
+            len => (0..=(haystack.len().checked_sub(len)?)),
+        };
+
+        for i in indices {
+            if &haystack[i..i + needle.len()] == needle {
+                return Some(i);
+            }
+        }
+
+        None
     }
 
     #[cfg(feature = "twoway")]
@@ -187,9 +214,36 @@ impl OsStrExt2 for OsStr {
     }
 
     #[cfg(not(feature = "twoway"))]
-    #[inline]
     fn rfind(&self, needle: &OsStr) -> Option<usize> {
-        self.find_all(needle).next_back()
+        let haystack = self.as_bytes();
+        let needle = needle.as_bytes();
+
+        #[cfg(feature = "memchr")]
+        let indices = match needle.len() {
+            0 => return Some(haystack.len()),
+            1 => return memchr::memrchr(needle[0], haystack),
+            len => {
+                memchr::memrchr_iter(needle[0], &haystack[..haystack.len().checked_sub(len)? + 1])
+            }
+        };
+
+        #[cfg(not(feature = "memchr"))]
+        let indices = match needle.len() {
+            0 => return Some(haystack.len()),
+            1 => {
+                let search_ch = needle[0];
+                return haystack.iter().rposition(|&ch| ch == search_ch);
+            }
+            len => (0..=(haystack.len().checked_sub(len)?)).rev(),
+        };
+
+        for i in indices {
+            if &haystack[i..i + needle.len()] == needle {
+                return Some(i);
+            }
+        }
+
+        None
     }
 
     fn substr(&self, start: usize, end: usize) -> OsString {
