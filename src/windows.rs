@@ -1,8 +1,91 @@
 use std::collections::VecDeque;
 use std::ffi::{OsStr, OsString};
+use std::iter::FusedIterator;
 use std::os::windows::ffi::*;
 
 use crate::OsStrExt2;
+
+pub struct OsStrFindIter {
+    haystack: Vec<u16>,
+    needle: Vec<u16>,
+    left: usize,
+    right: usize,
+}
+
+impl OsStrFindIter {
+    fn new(haystack: EncodeWide, needle: EncodeWide) -> Self {
+        let haystack: Vec<u16> = haystack.collect();
+        let needle: Vec<u16> = needle.collect();
+
+        let (left, right) = if let Some(diff) = haystack.len().checked_sub(needle.len()) {
+            // Add 1 to the right bound; this allow matching on the very last element
+            (0, diff + 1)
+        } else {
+            // Needle is longer than haystack -> force immediate failure
+            (1, 0)
+        };
+
+        Self {
+            haystack: haystack,
+            needle: needle,
+            left,
+            right,
+        }
+    }
+}
+
+impl Iterator for OsStrFindIter {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<usize> {
+        if self.left >= self.right {
+            return None;
+        } else if self.needle.is_empty() {
+            // An empty needle matches the whole way through
+            let index = self.left;
+            self.left += 1;
+            return Some(index);
+        }
+
+        // Naive search, but it works
+        for index in self.left..self.right {
+            if &self.haystack[index..index + self.needle.len()] == self.needle {
+                self.left = index + 1;
+                return Some(index);
+            }
+        }
+
+        // Force immediate return next time
+        self.left = self.right + 1;
+        None
+    }
+}
+
+impl DoubleEndedIterator for OsStrFindIter {
+    fn next_back(&mut self) -> Option<usize> {
+        if self.left >= self.right {
+            return None;
+        } else if self.needle.is_empty() {
+            // An empty needle matches the whole way through
+            self.right -= 1;
+            return Some(self.right);
+        }
+
+        // Naive search, but it works
+        for index in (self.left..self.right).rev() {
+            if &self.haystack[index..index + self.needle.len()] == self.needle {
+                self.right = index;
+                return Some(index);
+            }
+        }
+
+        // Force immediate return next time
+        self.left = self.right + 1;
+        None
+    }
+}
+
+impl FusedIterator for OsStrFindIter {}
 
 impl OsStrExt2 for OsStr {
     fn starts_with(&self, prefix: &OsStr) -> bool {
@@ -117,6 +200,10 @@ impl OsStrExt2 for OsStr {
         }
 
         res
+    }
+
+    fn find_all(&self, needle: &OsStr) -> OsStrFindIter {
+        OsStrFindIter::new(self.encode_wide(), needle.encode_wide())
     }
 
     fn substr(&self, start: usize, end: usize) -> OsString {
